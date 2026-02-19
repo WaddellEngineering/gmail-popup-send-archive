@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "Send & Archive for Gmail Compose",
+    "version": "1.0.0",
+    "description": "Adds a Send & Archive button to Gmail's popup compose window, matching the behavior of the inline compose window.",
+    "permissions": [],
+    "host_permissions": ["https://mail.google.com/*"],
+    "content_scripts": [
+        {
+            "matches": ["https://mail.google.com/*"],
+            "js": ["content.js"],
+            "css": ["styles.css"],
+            "run_at": "document_idle"
+        }
+    ],
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "action": {
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        },
+        "default_title": "Send & Archive for Gmail Compose"
+    }
+}

@@ -1,0 +1,50 @@
+/*
+ * Send & Archive Button — styles.css
+ *
+ * The button inherits most of its look from Gmail's own `.T-I` / `.aoO`
+ * classes (copied onto the element in content.js).  This file only adds
+ * the small tweaks needed to make it clearly distinct from the plain
+ * Send button and to ensure correct spacing.
+ */
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+/*
+ * Gmail's send button sits inside a flex container.  We want our button to
+ * appear immediately to the right with a small gap.
+ */
+[data-sab-btn] {
+    margin-left: 8px !important;
+}
+
+/* ── Colour ──────────────────────────────────────────────────────────────── */
+
+/*
+ * Match Gmail's Send button colour exactly.
+ * No opacity reduction — the two buttons should look identical at rest.
+ */
+[data-sab-btn].T-I {
+    background-color: rgb(11, 87, 208) !important;
+    opacity: 1;
+    white-space: nowrap;
+}
+
+[data-sab-btn].T-I:hover {
+    background-color: rgb(27, 97, 209) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-sab-btn].T-I:active {
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────────── */
+
+/*
+ * Gmail renders data-tooltip tooltips itself; no extra CSS needed.
+ * This rule is here as a safety net for any GM tooltip polyfills.
+ */
+[data-sab-btn]:focus {
+    outline: 2px solid rgb(11, 87, 208);
+    outline-offset: 2px;
+}
