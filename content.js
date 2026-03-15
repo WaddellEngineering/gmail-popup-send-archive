@@ -22,8 +22,8 @@
     /** Attribute set on the button we inject so we never mistake it for Gmail's send button. */
     const BTN_ATTR = "data-sab-btn";
 
-    // const LOG = (...args) => console.log("[SAB]", ...args);
-    // LOG("content script loaded");
+    const LOG = (...args) => console.log("[SAB]", ...args);
+    LOG("content script loaded");
 
     // ─── DOM Helpers ─────────────────────────────────────────────────────────
 
@@ -220,7 +220,7 @@
      * is used.
      */
     function archiveCurrentConversation(retriesLeft = 8) {
-        // LOG(`archiveCurrentConversation: attempt ${9 - retriesLeft} of 8`);
+        LOG(`archiveCurrentConversation: attempt ${9 - retriesLeft} of 8`);
         // Gmail renders the Archive button in the conversation toolbar.
         // The tooltip text can include the keyboard shortcut, e.g. "Archive (y)",
         // so we use prefix/contains matching in addition to exact matching.
@@ -240,17 +240,17 @@
             );
 
         if (archiveBtn) {
-            // LOG(
-            //     "archiveCurrentConversation: found archive button, clicking",
-            //     archiveBtn,
-            // );
+            LOG(
+                "archiveCurrentConversation: found archive button, clicking",
+                archiveBtn,
+            );
             simulateClick(archiveBtn);
             return;
         }
 
-        // LOG(
-        //     `archiveCurrentConversation: archive button not found (retries left: ${retriesLeft})`,
-        // );
+        LOG(
+            `archiveCurrentConversation: archive button not found (retries left: ${retriesLeft})`,
+        );
         // Not found yet — Gmail may still be transitioning to the thread view.
         if (retriesLeft > 0) {
             setTimeout(() => archiveCurrentConversation(retriesLeft - 1), 300);
@@ -258,7 +258,7 @@
         }
 
         // All retries exhausted — email was sent but archive couldn't be triggered.
-        // LOG("archiveCurrentConversation: giving up, showing toast");
+        LOG("archiveCurrentConversation: giving up, showing toast");
         showToast(
             "Send & Archive: email sent, but the Archive button wasn't found. Please archive manually.",
         );
@@ -299,12 +299,12 @@
         // its ancestors* (Gmail sometimes tears down a whole parent container).
         // Instead of chasing which specific node was removed, we simply check
         // whether composeEl is still in the document after any childList change.
-        // LOG("watchComposeForRemoval: watching for compose removal", composeEl);
+        LOG("watchComposeForRemoval: watching for compose removal", composeEl);
         const removalObserver = new MutationObserver(() => {
             if (!document.contains(composeEl)) {
-                // LOG(
-                //     "watchComposeForRemoval: compose removed from DOM, triggering archive",
-                // );
+                LOG(
+                    "watchComposeForRemoval: compose removed from DOM, triggering archive",
+                );
                 removalObserver.disconnect();
                 onRemoved();
             }
@@ -349,31 +349,31 @@
      * Ctrl+Shift+Enter keyboard shortcut.
      */
     function triggerSendAndArchive(composeEl, sendBtn) {
-        // LOG("triggerSendAndArchive: invoked");
+        LOG("triggerSendAndArchive: invoked");
 
         // ── Preferred path ────────────────────────────────────────────────────
         const nativeBtn = findNativeSendAndArchiveButton(composeEl);
         if (nativeBtn) {
-            // LOG(
-            //     "triggerSendAndArchive: using native Send & Archive button",
-            //     nativeBtn,
-            // );
+            LOG(
+                "triggerSendAndArchive: using native Send & Archive button",
+                nativeBtn,
+            );
             simulateClick(nativeBtn);
             return;
         }
-        // LOG(
-        //     "triggerSendAndArchive: no native button, using fallback send+archive",
-        // );
+        LOG(
+            "triggerSendAndArchive: no native button, using fallback send+archive",
+        );
 
         // ── Fallback path ─────────────────────────────────────────────────────
         watchComposeForRemoval(composeEl, () => {
-            // LOG(
-            //     "triggerSendAndArchive: compose closed, waiting 2s then archiving",
-            // );
+            LOG(
+                "triggerSendAndArchive: compose closed, waiting 2s then archiving",
+            );
             setTimeout(archiveCurrentConversation, 2000);
         });
 
-        // LOG("triggerSendAndArchive: clicking Send button", sendBtn);
+        LOG("triggerSendAndArchive: clicking Send button", sendBtn);
         setTimeout(() => sendBtn.click(), 0);
     }
 
@@ -387,7 +387,7 @@
         const sendBtn = findSendButton(composeEl);
         if (!sendBtn) return; // Not ready yet — caller should retry.
 
-        // LOG("injecting button into compose window", composeEl);
+        LOG("injecting button into compose window", composeEl);
         // Mark as processed before mutating the DOM to prevent re-entrancy.
         composeEl.setAttribute(PROCESSED_ATTR, "true");
 
@@ -402,7 +402,7 @@
                 if (e.key === "Enter" && e.ctrlKey && e.shiftKey) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                    // LOG("Ctrl+Shift+Enter intercepted");
+                    LOG("Ctrl+Shift+Enter intercepted");
                     triggerSendAndArchive(composeEl, sendBtn);
                 }
             },
@@ -420,7 +420,7 @@
         btn.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopImmediatePropagation();
-            // LOG("button clicked");
+            LOG("button clicked");
             triggerSendAndArchive(composeEl, sendBtn);
         });
 
@@ -462,7 +462,7 @@
     function scanAll() {
         scanTimer = null;
         const dwEls = document.querySelectorAll(".dw");
-        // LOG(`scanAll: found ${dwEls.length} .dw element(s)`);
+        LOG(`scanAll: found ${dwEls.length} .dw element(s)`);
         dwEls.forEach((dw) => {
             findComposeWindows(dw).forEach((composeEl) =>
                 tryInjectWithRetry(composeEl),
@@ -522,13 +522,13 @@
     // initial render — we only start watching once the browser is truly idle.
     // A 6 s hard timeout ensures we start even on a very busy tab.
     runWhenIdle(() => {
-        // LOG("starting MutationObserver");
+        LOG("starting MutationObserver");
         mainObserver.observe(document.body, { childList: true, subtree: true });
     }, 6000);
 
     // ─── Initial Scan
     runWhenIdle(() => {
-        // LOG("running initial scan");
+        LOG("running initial scan");
         scheduleScan(0);
     }, 6000);
 })();
